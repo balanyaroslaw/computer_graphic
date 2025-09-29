@@ -1,0 +1,39 @@
+@import "tailwindcss";
+
+@theme {
+  --oscilloscope: #00FF00;
+}
+
+body {
+  margin: 0;
+  font-family: 'Press Start 2P', 'Courier New', monospace;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #000000;
+  color: #00FF00;
+  overflow-x: hidden;
+}
+
+
+.text-glow {
+  text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00;
+}
+
+.border-glow {
+  box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00;
+}
+
+canvas {
+  border: 1px solid #00FF00;
+  box-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00;
+}
+
+button:hover {
+  text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00, 0 0 20px #00FF00;
+  transition: text-shadow 0.3s ease;
+}
+
+nav a:hover {
+  text-shadow: 0 0 5px #00FF00, 0 0 10px #00FF00, 0 0 15px #00FF00, 0 0 20px #00FF00;
+  transition: text-shadow 0.3s ease;
+}
