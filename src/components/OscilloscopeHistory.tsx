@@ -57,6 +57,13 @@ const OscilloscopeHistory: React.FC = () => {
     },
   ];
 
+  const [isMobile, setIsMobile] = useState<boolean>(window.innerWidth < 768);
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const imageMap = new Map<string, HTMLImageElement>();
     const imagesToLoad = [
@@ -248,6 +255,23 @@ const OscilloscopeHistory: React.FC = () => {
     }
   };
 
+  if (isMobile) {
+    const currentData = historyData[currentIndex];
+    return (
+      <div className="space-y-6 px-4">
+        <div className="p-4 bg-black border border-oscilloscope rounded text-oscilloscope font-mono space-y-2">
+          <h4 className="font-bold">{currentData.title}</h4>
+          <p>{currentData.content}</p>
+          <div className="flex justify-between">
+            <button onClick={handleUp} disabled={currentIndex === 0} className="px-4 py-2 border rounded text-oscilloscope disabled:opacity-50">Назад</button>
+            <button onClick={handleDown} disabled={currentIndex === historyData.length - 1} className="px-4 py-2 border rounded text-oscilloscope disabled:opacity-50">Далі</button>
+          </div>
+          <div className="text-right text-sm">{currentIndex + 1} / {historyData.length}</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="text-center">
@@ -255,7 +279,7 @@ const OscilloscopeHistory: React.FC = () => {
           Осцилограф історії комп'ютерної графіки
         </h3>
         
-        <div className="flex justify-center">
+        {!isMobile && <div className="flex justify-center">
           <div className="relative w-full max-w-7xl">
             <canvas
               ref={canvasRef}
@@ -295,7 +319,7 @@ const OscilloscopeHistory: React.FC = () => {
               </div>
             </div>
           </div>
-        </div>
+        </div>}
       </div>
     </div>
   );

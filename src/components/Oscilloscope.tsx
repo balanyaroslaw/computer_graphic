@@ -1,8 +1,31 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 
 const Oscilloscope: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const animationRef = useRef<number | null>(null);
+  const [dimensions, setDimensions] = useState({ width: 600, height: 400 });
+
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth;
+        const isMobile = window.innerWidth < 768;
+        
+        const width = Math.min(containerWidth - 32, isMobile ? 380 : 600);
+        const height = isMobile ? 300 : 400;
+        
+        setDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+
+    return () => {
+      window.removeEventListener('resize', updateDimensions);
+    };
+  }, []);
 
   const drawGrid = (ctx: CanvasRenderingContext2D, width: number, height: number): void => {
     ctx.strokeStyle = '#00FF00';
@@ -34,7 +57,7 @@ const Oscilloscope: React.FC = () => {
 
     ctx.beginPath();
     for (let x = 0; x < width; x += 2) {
-      const y = height / 2 + Math.sin((x * 0.02) + (time * 0.01)) * 50;
+      const y = height / 2 + Math.sin((x * 0.02) + (time * 0.01)) * (height * 0.12);
       if (x === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -47,7 +70,7 @@ const Oscilloscope: React.FC = () => {
     ctx.globalAlpha = 0.7;
     ctx.beginPath();
     for (let x = 0; x < width; x += 2) {
-      const y = height / 2 + Math.cos((x * 0.03) + (time * 0.015)) * 30;
+      const y = height / 2 + Math.cos((x * 0.03) + (time * 0.015)) * (height * 0.075);
       if (x === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -60,7 +83,7 @@ const Oscilloscope: React.FC = () => {
     ctx.globalAlpha = 0.5;
     ctx.beginPath();
     for (let x = 0; x < width; x += 2) {
-      const y = height / 2 + Math.sin((x * 0.01) + (time * 0.02)) * Math.cos((x * 0.05) + (time * 0.01)) * 40;
+      const y = height / 2 + Math.sin((x * 0.01) + (time * 0.02)) * Math.cos((x * 0.05) + (time * 0.01)) * (height * 0.1);
       if (x === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -74,19 +97,23 @@ const Oscilloscope: React.FC = () => {
   };
 
   const drawText = (ctx: CanvasRenderingContext2D, width: number, height: number): void => {
+    const isMobile = width < 500;
+    const fontSize = isMobile ? 8 : 12;
+    const titleFontSize = isMobile ? 10 : 16;
+    
     ctx.fillStyle = '#00FF00';
-    ctx.font = '12px "Press Start 2P", monospace';
+    ctx.font = `${fontSize}px "Press Start 2P", monospace`;
     ctx.textAlign = 'left';
     
     ctx.fillText('CH1: 1V/div', 10, 20);
-    ctx.fillText('TIME: 1ms/div', 10, 35);
+    ctx.fillText(isMobile ? 'TIME: 1ms' : 'TIME: 1ms/div', 10, 35);
     
     ctx.textAlign = 'right';
-    ctx.fillText('FREQ: 1kHz', width - 10, 20);
-    ctx.fillText('TRIG: AUTO', width - 10, 35);
+    ctx.fillText(isMobile ? 'FREQ: 1kHz' : 'FREQ: 1kHz', width - 10, 20);
+    ctx.fillText(isMobile ? 'TRIG: AUTO' : 'TRIG: AUTO', width - 10, 35);
     
     ctx.textAlign = 'center';
-    ctx.font = '16px "Press Start 2P", monospace';
+    ctx.font = `${titleFontSize}px "Press Start 2P", monospace`;
     ctx.fillText('OSCILLOSCOPE', width / 2, height - 10);
   };
 
@@ -102,11 +129,8 @@ const Oscilloscope: React.FC = () => {
     const time = Date.now();
 
     ctx.clearRect(0, 0, width, height);
-
     drawGrid(ctx, width, height);
-
     drawWaves(ctx, width, height, time);
-
     drawText(ctx, width, height);
 
     animationRef.current = requestAnimationFrame(animate);
@@ -120,21 +144,17 @@ const Oscilloscope: React.FC = () => {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, []);
-
+  }, [dimensions]);
 
   return (
-    <div className="space-y-4">
-      <div className="text-center">
-        
-        <div className="flex justify-center">
-          <canvas
-            ref={canvasRef}
-            width={600}
-            height={600}
-            className="border border-oscilloscope border-glow"
-          />
-        </div>
+    <div ref={containerRef} className="w-full space-y-4">
+      <div className="flex justify-center">
+        <canvas
+          ref={canvasRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          className="border border-green-500 shadow-lg shadow-green-500/50 max-w-full"
+        />
       </div>
     </div>
   );

@@ -5,8 +5,15 @@ const MandelbrotCanvas: React.FC = () => {
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   
-  const [width, setWidth] = useState<number>(400);
-  const [height, setHeight] = useState<number>(400);
+  const getDefaultSize = () => {
+    if (typeof window !== 'undefined') {
+      return window.innerWidth < 768 ? Math.min(window.innerWidth - 40, 400) : 400;
+    }
+    return 400;
+  };
+  
+  const [width, setWidth] = useState<number>(getDefaultSize());
+  const [height, setHeight] = useState<number>(getDefaultSize());
   const [maxIterations, setMaxIterations] = useState<number>(100);
   const [zoom, setZoom] = useState<number>(1);
   const [centerX, setCenterX] = useState<number>(-0.5);
@@ -35,7 +42,6 @@ const MandelbrotCanvas: React.FC = () => {
     
     return maxIterations;
   };
-
 
   const getColor = (iterations: number, maxIterations: number): string => {
     if (iterations === maxIterations) {
@@ -67,7 +73,6 @@ const MandelbrotCanvas: React.FC = () => {
         return `rgb(0, ${Math.floor(255 * intensity)}, 0)`;
     }
   };
-
 
   const drawMandelbrot = (): void => {
     const canvas = canvasRef.current;
@@ -144,11 +149,9 @@ const MandelbrotCanvas: React.FC = () => {
     setShowSettings(false);
   };
 
-
   const handleGenerate = (): void => {
     setIsGenerated(true);
   };
-
 
   const handleDelete = (): void => {
     setIsGenerated(false);
@@ -169,8 +172,9 @@ const MandelbrotCanvas: React.FC = () => {
   };
 
   const handleReset = (): void => {
-    setWidth(400);
-    setHeight(400);
+    const defaultSize = getDefaultSize();
+    setWidth(defaultSize);
+    setHeight(defaultSize);
     setMaxIterations(100);
     setZoom(1);
     setCenterX(-0.5);
@@ -179,192 +183,217 @@ const MandelbrotCanvas: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {showSettings && (
-        <div className="border border-oscilloscope border-glow p-4 rounded-lg">
-          <h3 className="text-xl font-bold text-glow mb-4 text-center">
-            Налаштування фрактала
-          </h3>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 font-press-start">
-            <div>
-              <label className="block text-sm font-medium text-oscilloscope mb-2">
-                Ширина: {width}px
-              </label>
-              <input
-                type="range"
-                min="200"
-                max="800"
-                value={width}
-                onChange={(e) => setWidth(parseInt(e.target.value))}
-                className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
-              />
+    <div className="min-h-screen bg-black text-green-500 p-2 sm:p-4">
+      <style>{`
+        .text-oscilloscope { color: #00ff00; }
+        .border-oscilloscope { border-color: #00ff00; }
+        .bg-oscilloscope { background-color: #00ff00; }
+        .text-glow { text-shadow: 0 0 10px #00ff00; }
+        .border-glow { box-shadow: 0 0 10px #00ff00; }
+        input[type="range"]::-webkit-slider-thumb {
+          appearance: none;
+          width: 16px;
+          height: 16px;
+          background: #00ff00;
+          cursor: pointer;
+          border-radius: 50%;
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 16px;
+          height: 16px;
+          background: #00ff00;
+          cursor: pointer;
+          border-radius: 50%;
+          border: none;
+        }
+      `}</style>
+      
+      <div className="space-y-4 max-w-4xl mx-auto">
+        {showSettings && (
+          <div className="border border-oscilloscope border-glow p-3 sm:p-4 rounded-lg">
+            <h3 className="text-lg sm:text-xl font-bold text-glow mb-3 sm:mb-4 text-center">
+              Налаштування фрактала
+            </h3>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                  Ширина: {width}px
+                </label>
+                <input
+                  type="range"
+                  min="200"
+                  max="800"
+                  value={width}
+                  onChange={(e) => setWidth(parseInt(e.target.value))}
+                  className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                  Висота: {height}px
+                </label>
+                <input
+                  type="range"
+                  min="200"
+                  max="800"
+                  value={height}
+                  onChange={(e) => setHeight(parseInt(e.target.value))}
+                  className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                  Ітерації: {maxIterations}
+                </label>
+                <input
+                  type="range"
+                  min="50"
+                  max="500"
+                  value={maxIterations}
+                  onChange={(e) => setMaxIterations(parseInt(e.target.value))}
+                  className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                  Зум: {zoom.toFixed(1)}x
+                </label>
+                <input
+                  type="range"
+                  min="0.5"
+                  max="10"
+                  step="0.1"
+                  value={zoom}
+                  onChange={(e) => setZoom(parseFloat(e.target.value))}
+                  className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                  Центр X: {centerX.toFixed(3)}
+                </label>
+                <input
+                  type="range"
+                  min="-2"
+                  max="1"
+                  step="0.001"
+                  value={centerX}
+                  onChange={(e) => setCenterX(parseFloat(e.target.value))}
+                  className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                  Центр Y: {centerY.toFixed(3)}
+                </label>
+                <input
+                  type="range"
+                  min="-1.5"
+                  max="1.5"
+                  step="0.001"
+                  value={centerY}
+                  onChange={(e) => setCenterY(parseFloat(e.target.value))}
+                  className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
+                />
+              </div>
             </div>
             
-            <div>
-              <label className="block text-sm font-medium text-oscilloscope mb-2">
-                Висота: {height}px
+            <div className="mt-3 sm:mt-4">
+              <label className="block text-xs sm:text-sm font-medium text-oscilloscope mb-2">
+                Кольорова схема:
               </label>
-              <input
-                type="range"
-                min="200"
-                max="800"
-                value={height}
-                onChange={(e) => setHeight(parseInt(e.target.value))}
-                className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-oscilloscope mb-2">
-                Ітерації: {maxIterations}
-              </label>
-              <input
-                type="range"
-                min="50"
-                max="500"
-                value={maxIterations}
-                onChange={(e) => setMaxIterations(parseInt(e.target.value))}
-                className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-oscilloscope mb-2">
-                Зум: {zoom.toFixed(1)}x
-              </label>
-              <input
-                type="range"
-                min="0.5"
-                max="10"
-                step="0.1"
-                value={zoom}
-                onChange={(e) => setZoom(parseFloat(e.target.value))}
-                className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-oscilloscope mb-2">
-                Центр X: {centerX.toFixed(3)}
-              </label>
-              <input
-                type="range"
-                min="-2"
-                max="1"
-                step="0.001"
-                value={centerX}
-                onChange={(e) => setCenterX(parseFloat(e.target.value))}
-                className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-oscilloscope mb-2">
-                Центр Y: {centerY.toFixed(3)}
-              </label>
-              <input
-                type="range"
-                min="-1.5"
-                max="1.5"
-                step="0.001"
-                value={centerY}
-                onChange={(e) => setCenterY(parseFloat(e.target.value))}
-                className="w-full h-2 bg-black border border-oscilloscope rounded-lg appearance-none cursor-pointer"
-              />
-            </div>
-          </div>
-          
-          <div className="mt-4">
-            <label className="block text-sm font-medium text-oscilloscope mb-2">
-              Кольорова схема:
-            </label>
-            <select
-              value={colorScheme}
-              onChange={(e) => setColorScheme(e.target.value)}
-              className="bg-black border border-oscilloscope text-oscilloscope px-3 py-2 rounded-lg"
-            >
-              <option value="rainbow">Веселка</option>
-              <option value="fire">Вогонь</option>
-              <option value="ocean">Океан</option>
-              <option value="oscilloscope">Осцилограф</option>
-            </select>
-          </div>
-          
-          <div className="flex justify-center space-x-4 mt-4">
-            <button
-              onClick={handleReset}
-              className="bg-transparent border border-oscilloscope text-oscilloscope px-4 py-2 rounded-lg transition-all duration-300"
-            >
-              Скинути
-            </button>
-            <button
-              onClick={handleConfigure}
-              className="bg-transparent border-2 text-oscilloscope 
-                     px-8 py-4 text-base font-bold rounded-lg"
-            >
-              Підтвердити налаштування
-            </button>
-          </div>
-        </div>
-      )}
-    
-      {isConfigured && !showSettings && (
-        <div className="border border-oscilloscope border-glow p-4 rounded-lg font-press-start">
-          <h3 className="text-xl font-bold text-glow mb-4 text-center">
-            Управління фракталом
-          </h3>
-          
-          <div className="flex justify-center space-x-4">
-            {!isGenerated ? (
-              <button
-                onClick={handleGenerate}
-                className="bg-transparent border-2 text-oscilloscope 
-                     px-8 py-4 text-base font-bold rounded-lg"
+              <select
+                value={colorScheme}
+                onChange={(e) => setColorScheme(e.target.value)}
+                className="w-full sm:w-auto bg-black border border-oscilloscope text-oscilloscope px-3 py-2 rounded-lg text-sm sm:text-base"
               >
-                Згенерувати фрактал
+                <option value="rainbow">Веселка</option>
+                <option value="fire">Вогонь</option>
+                <option value="ocean">Океан</option>
+                <option value="oscilloscope">Осцилограф</option>
+              </select>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4 mt-3 sm:mt-4">
+              <button
+                onClick={handleReset}
+                className="bg-transparent border border-oscilloscope text-oscilloscope px-4 py-2 rounded-lg transition-all duration-300 text-sm sm:text-base hover:bg-oscilloscope hover:text-black"
+              >
+                Скинути
               </button>
-            ) : (
-              <>
+              <button
+                onClick={handleConfigure}
+                className="bg-transparent border-2 border-oscilloscope text-oscilloscope px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold rounded-lg hover:bg-oscilloscope hover:text-black transition-all duration-300"
+              >
+                Підтвердити налаштування
+              </button>
+            </div>
+          </div>
+        )}
+      
+        {isConfigured && !showSettings && (
+          <div className="border border-oscilloscope border-glow p-3 sm:p-4 rounded-lg">
+            <h3 className="text-lg sm:text-xl font-bold text-glow mb-3 sm:mb-4 text-center">
+              Управління фракталом
+            </h3>
+            
+            <div className="flex flex-col sm:flex-row justify-center gap-2 sm:gap-4">
+              {!isGenerated ? (
                 <button
-                  onClick={handleEditSettings}
-                  className="bg-transparent border border-oscilloscope text-oscilloscope px-4 py-2 rounded-lg hover:bg-oscilloscope hover:text-black transition-all duration-300"
+                  onClick={handleGenerate}
+                  className="bg-transparent border-2 border-oscilloscope text-oscilloscope px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-bold rounded-lg hover:bg-oscilloscope hover:text-black transition-all duration-300"
                 >
-                  Редагувати налаштування
+                  Згенерувати фрактал
                 </button>
-                <button
-                  onClick={handleDelete}
-                  className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-300"
-                >
-                  Видалити фрактал
-                </button>
-                <button
-                  onClick={() => {
-                    setIsGenerated(false);
-                    setTimeout(() => setIsGenerated(true), 100);
-                  }}
-                  className="bg-transparent border border-oscilloscope text-oscilloscope px-4 py-2 rounded-lg hover:bg-oscilloscope hover:text-black transition-all duration-300"
-                >
-                  Перегенерувати
-                </button>
-              </>
+              ) : (
+                <>
+                  <button
+                    onClick={handleEditSettings}
+                    className="bg-transparent border border-oscilloscope text-oscilloscope px-3 sm:px-4 py-2 rounded-lg hover:bg-oscilloscope hover:text-black transition-all duration-300 text-xs sm:text-base"
+                  >
+                    Редагувати
+                  </button>
+                  <button
+                    onClick={handleDelete}
+                    className="bg-red-600 border border-red-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-red-700 transition-all duration-300 text-xs sm:text-base"
+                  >
+                    Видалити
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsGenerated(false);
+                      setTimeout(() => setIsGenerated(true), 100);
+                    }}
+                    className="bg-transparent border border-oscilloscope text-oscilloscope px-3 sm:px-4 py-2 rounded-lg hover:bg-oscilloscope hover:text-black transition-all duration-300 text-xs sm:text-base"
+                  >
+                    Перегенерувати
+                  </button>
+                </>
+              )}
+            </div>
+            
+            {isGenerated && (
+              <div className="mt-3 sm:mt-4 text-center">
+                <p className="text-oscilloscope text-xs sm:text-sm">
+                  Клікніть по фракталу для зуму
+                </p>
+                <p className="text-oscilloscope text-xs sm:text-sm mt-1">
+                  Зум: {zoom.toFixed(1)}x | Центр: ({centerX.toFixed(3)}, {centerY.toFixed(3)})
+                </p>
+              </div>
             )}
           </div>
-          
-          {isGenerated && (
-            <div className="mt-4 text-center">
-              <p className="text-oscilloscope text-sm">
-                Клікніть по фракталу для зуму | Зум: {zoom.toFixed(1)}x | Центр: ({centerX.toFixed(3)}, {centerY.toFixed(3)})
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-      
-      <div className="w-full flex justify-center text-center">
+        )}
+        
         {isGenerating && (
-          <div className="mb-4">
-            <p className="text-oscilloscope mb-2">Генерація фрактала... {progress}%</p>
+          <div className="w-full max-w-md mx-auto px-2">
+            <p className="text-oscilloscope mb-2 text-sm sm:text-base text-center">Генерація фрактала... {progress}%</p>
             <div className="w-full bg-black border border-oscilloscope rounded-lg overflow-hidden">
               <div 
                 className="bg-oscilloscope h-2 transition-all duration-300"
@@ -375,15 +404,18 @@ const MandelbrotCanvas: React.FC = () => {
         )}
         
         {isConfigured && isGenerated && (
-          <canvas
-            ref={canvasRef}
-            width={width}
-            height={height}
-            onClick={handleCanvasClick}
-            className={`border border-oscilloscope border-glow ${
-              isGenerated ? 'cursor-crosshair' : 'cursor-default'
-            }`}
-          />
+          <div className="w-full flex justify-center">
+            <canvas
+              ref={canvasRef}
+              width={width}
+              height={height}
+              onClick={handleCanvasClick}
+              className={`border border-oscilloscope border-glow max-w-full h-auto ${
+                isGenerated ? 'cursor-crosshair' : 'cursor-default'
+              }`}
+              style={{ touchAction: 'none' }}
+            />
+          </div>
         )}
       </div>
     </div>
