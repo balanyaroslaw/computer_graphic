@@ -6,7 +6,7 @@ const Fractals: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      <h1 className="text-xl md:text-5xl font-bold text-glow text-center">
+      <h1 className="text-xl md:text-5xl font-bold text-center">
         Фрактал Мандельброта
       </h1>
       

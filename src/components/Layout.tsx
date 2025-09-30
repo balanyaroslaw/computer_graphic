@@ -30,15 +30,13 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <nav className="border-b border-oscilloscope border-glow">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo and Title */}
             <div className="flex items-center gap-2 sm:gap-5">
               <img src={Logo} alt="Logo" className='w-8 h-8 sm:w-10 sm:h-10'/>
-              <h1 className="text-xs sm:text-sm md:text-xl font-bold text-glow">
+              <h1 className="text-xs sm:text-sm md:text-xl font-bold">
                 Комп'ютерна графіка
               </h1>
             </div>
 
-            {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-6 lg:space-x-8">
               {navLinks.map((link) => (
                 <Link
@@ -55,7 +53,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
               ))}
             </div>
 
-            {/* Mobile Menu Button */}
             <button
               onClick={toggleMobileMenu}
               className="md:hidden p-2 text-oscilloscope hover:bg-oscilloscope/10 rounded transition-colors"
@@ -65,7 +62,6 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
           </div>
 
-          {/* Mobile Navigation */}
           {mobileMenuOpen && (
             <div className="md:hidden py-4 space-y-3 border-t border-oscilloscope/30 animate-fadeIn">
               {navLinks.map((link) => (

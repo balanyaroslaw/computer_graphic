@@ -259,7 +259,7 @@ const OscilloscopeHistory: React.FC = () => {
     const currentData = historyData[currentIndex];
     return (
       <div className="space-y-6 px-4">
-        <div className="p-4 bg-black border border-oscilloscope rounded text-oscilloscope font-mono space-y-2">
+        <div className="p-4 bg-black border border-oscilloscope rounded text-oscilloscope space-y-2">
           <h4 className="font-bold">{currentData.title}</h4>
           <p>{currentData.content}</p>
           <div className="flex justify-between">
